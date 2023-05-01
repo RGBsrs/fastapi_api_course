@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "fastapi-api-course"
+version = "0.1.0"
+description = "Fastapi API course"
+authors = ["RGBsrs <grjanko.d.a@gmail.com>"]
+readme = "README.md"
+packages = [{include = "fastapi_api_course"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["all"], version = "^0.93.0"}
+databases = "^0.7.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
