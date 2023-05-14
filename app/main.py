@@ -1,19 +1,22 @@
 from typing import List
 from fastapi import Depends, FastAPI, Response, status
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 
 from fastapi.exceptions import HTTPException
 
 from . import models, schemas
 from .database import engine, get_db
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 models.Base.metadata.create_all(bind=engine)
-
 
 app = FastAPI()
 
 
-@app.get("/posts", status_code=status.HTTP_200_OK, response_model=List[schemas.PostResponse])
+@app.get(
+    "/posts", status_code=status.HTTP_200_OK, response_model=List[schemas.PostResponse]
+)
 async def get_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     return posts
@@ -30,7 +33,9 @@ async def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
     return new_post
 
 
-@app.get("/posts/{id}", status_code=status.HTTP_200_OK,response_model=schemas.PostResponse)
+@app.get(
+    "/posts/{id}", status_code=status.HTTP_200_OK, response_model=schemas.PostResponse
+)
 async def get_post(id: int, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id).first()
     if not post:
@@ -54,7 +59,9 @@ async def delete_post(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@app.patch("/posts/{id}", status_code=status.HTTP_200_OK, response_model=schemas.PostResponse)
+@app.patch(
+    "/posts/{id}", status_code=status.HTTP_200_OK, response_model=schemas.PostResponse
+)
 def patch_post(id: int, post=schemas.PostCreate, db=Depends(get_db)):
     query = db.query(models.Post).filter(models.Post.id == id)
     old_post = query.first()
@@ -68,8 +75,12 @@ def patch_post(id: int, post=schemas.PostCreate, db=Depends(get_db)):
     return query.first()
 
 
-@app.post("/users", status_code=status.HTTP_201_CREATED)
+@app.post(
+    "/users", status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse
+)
 async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    hashed_pwd = pwd_context.hash(user.password)
+    user.password = hashed_pwd
     new_user = models.User(**user.dict())
     db.add(new_user)
     db.commit()

@@ -10,6 +10,7 @@ packages = [{include = "fastapi_api_course"}]
 python = "^3.11"
 fastapi = {extras = ["all"], version = "^0.93.0"}
 databases = "^0.7.0"
+passlib = "^1.7.4"
 
 
 [build-system]

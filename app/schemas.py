@@ -23,3 +23,10 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     pass
+
+class UserResponse(BaseModel):
+    id:int
+    email: EmailStr
+    created_at: datetime
+    class Config:
+        orm_mode = True
